@@ -5,7 +5,7 @@
       "resolveJsonModule": false,
       "esModuleInterop": true,
       "target": "ES6",
-      "outDir": "../dist/api",
+      "outDir": "../dist/cron",
       "sourceMap": true,
       "types": [
         "node"
