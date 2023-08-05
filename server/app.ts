@@ -1,21 +1,48 @@
-import * as path from 'path';
-import * as express from 'express';
+import path from 'path';
+import express from 'express';
+import { LeetCode } from "leetcode-query";
+import { FileDB, ProblemPool, ProblemSummary } from '../cron/job';
 import { Express, Request, Response } from 'express';
 
-export default function createApp() : Express {
+const PORT = 3000;
+
+// export default function createApp() : Express {
     const app = express();
+    const leetcode = new LeetCode(); 
 
-    app.use(express.static(path.join(__dirname, '../dist/client'))); 
+    let summary: ProblemSummary;
 
-    app.get('/home', async (req: Request, res: Response) => {
-        res.sendFile('index.html');
+    app.get('/', async (req: Request, res: Response) => {
+        res.sendFile((path.join(__dirname, '../../client/', 'index.html')));
+
+        summary = new ProblemSummary();
     });
 
-    app.get('/api/:name', async (req: Request, res: Response) => {
-        const name = req.params['name'];
-        const greeting = { greeting: `Hello, ${ name }` };
-        res.send(greeting);
+    app.get('/:username', async (req: Request, res: Response) => {
+        const recent_submissions = await leetcode.recent_submissions("pkpawan");
+
+        summary.update(recent_submissions);
+
+        const timeAscPool = new ProblemPool(summary);
+        timeAscPool.sortAscTimestamp();
+
+        const { content, title } = (await leetcode.problem(timeAscPool.getLastSlug()));
+        const notes = summary.getProblemRecord(timeAscPool.getLastSlug());
+
+        res.json({
+            title: title,
+            content: content,
+            notes: notes
+        })
     });
 
-    return app;
-}
+    app.get('/end', async (req: Request, res: Response) => {
+        new FileDB('data.json').write(summary.toString());
+        res.json("Saved Session. You can leave page now");
+    });
+
+    app.listen(PORT, () => {
+        console.log(`running on port: ${PORT}`)
+    })
+//     return app;
+// }
