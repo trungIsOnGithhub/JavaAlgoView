@@ -6,43 +6,61 @@ import { Express, Request, Response } from 'express';
 
 const PORT = 3000;
 
-// export default function createApp() : Express {
-    const app = express();
-    const leetcode = new LeetCode(); 
+const app = express();
+app.use(express.json());
 
-    let summary: ProblemSummary;
+const leetcode = new LeetCode(); 
 
-    app.get('/', async (req: Request, res: Response) => {
-        res.sendFile((path.join(__dirname, '../../client/', 'index.html')));
+let summary: ProblemSummary = new ProblemSummary();
 
-        summary = new ProblemSummary();
-    });
+app.get('/', async (req: Request, res: Response) => {
+    res.sendFile((path.join(__dirname, '../../client/', 'index.html')));
+});
 
-    app.get('/:username', async (req: Request, res: Response) => {
-        const recent_submissions = await leetcode.recent_submissions("pkpawan");
+app.get('/:username', async (req: Request, res: Response) => {
+    const recent_submissions = await leetcode.recent_submissions(req.params['username']);
 
-        summary.update(recent_submissions);
+    if(recent_submissions.length <= 0) {
+        res.status(404).json("User Not Found");
+        return;
+    }
 
-        const timeAscPool = new ProblemPool(summary);
-        timeAscPool.sortAscTimestamp();
+    summary.update(recent_submissions);
 
-        const { content, title } = (await leetcode.problem(timeAscPool.getLastSlug()));
-        const notes = summary.getProblemRecord(timeAscPool.getLastSlug());
+    const timeAscPool = new ProblemPool(summary);
+    timeAscPool.sortAscTimestamp();
 
-        res.json({
-            title: title,
-            content: content,
-            notes: notes
-        })
-    });
+    let currentLastSlug = timeAscPool.getLastSlug();
 
-    app.get('/end', async (req: Request, res: Response) => {
-        new FileDB('data.json').write(summary.toString());
-        res.json("Saved Session. You can leave page now");
-    });
+    const { content, title } = (await leetcode.problem(currentLastSlug));
+    const notes = summary.getProblemRecord(currentLastSlug);
 
-    app.listen(PORT, () => {
-        console.log(`running on port: ${PORT}`)
+    res.status(200).json({
+        slug: currentLastSlug,
+        title: title,
+        content: content,
+        notes: notes
     })
-//     return app;
-// }
+});
+
+app.post('/:titleSlug/note', async (req: Request, res: Response) => {
+    let noteContent = req.body.content;
+
+    if(!summary.existProblem(req.params['titleSlug'])) {
+        res.status(404).json("Unavailable Problem!");
+        return;
+    }
+
+    summary.addNoteToProblem(req.params['titleSlug'], noteContent);
+
+    res.status(200).json("Note Added Successfully!");
+});
+
+app.get('/end', async (req: Request, res: Response) => {
+    new FileDB().write(summary.toString());
+    res.status(200).json("Saved Session. You can leave page now");
+});
+
+app.listen(PORT, () => {
+    console.log(`running on port: ${PORT}`)
+})
