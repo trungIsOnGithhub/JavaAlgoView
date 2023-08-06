@@ -17,6 +17,11 @@ app.get('/', async (req: Request, res: Response) => {
     res.sendFile((path.join(__dirname, '../../client/', 'index.html')));
 });
 
+app.get('/save', async (req: Request, res: Response) => {
+    new FileDB().write(summary.toString());
+    res.status(200).json("Saved Session. You can leave page now");
+});
+
 app.get('/:username', async (req: Request, res: Response) => {
     const recent_submissions = await leetcode.recent_submissions(req.params['username']);
 
@@ -54,11 +59,6 @@ app.post('/:titleSlug/note', async (req: Request, res: Response) => {
     summary.addNoteToProblem(req.params['titleSlug'], noteContent);
 
     res.status(200).json("Note Added Successfully!");
-});
-
-app.get('/end', async (req: Request, res: Response) => {
-    new FileDB().write(summary.toString());
-    res.status(200).json("Saved Session. You can leave page now");
 });
 
 app.listen(PORT, () => {
