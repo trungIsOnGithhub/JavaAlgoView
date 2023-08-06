@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-@NgModule({
+@NgModule({ // each component must belong to an NG module in order to be available to others
   declarations: [
     AppComponent
   ],
@@ -13,6 +13,8 @@ import { AppComponent } from './app.component';
     AppRoutingModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [
+    AppComponent
+  ]
 })
 export class AppModule { }
