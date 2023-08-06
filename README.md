@@ -31,4 +31,9 @@ npm run start-cron
 npm run start-api 
 ```
 
+5. run client module
+```bash
+ng serve # for testing
+```
+
 _Enjoy! May have Bug :eyes_
