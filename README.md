@@ -3,6 +3,7 @@
 > Developed with Angular CLI 16.1.7 - Node 18.x LTS - TypeScript 5.1.6
 
 1. create _"data.json"_ in root for long-term data storing
+
 _w/ Bash_
 ```bash
     touch data.json # in root folder
