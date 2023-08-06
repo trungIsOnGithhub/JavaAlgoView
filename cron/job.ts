@@ -1,14 +1,17 @@
 import * as fs from "fs";
 import * as path from "path";
+import dotenv from "dotenv";
 import { LeetCode, RecentSubmission } from "leetcode-query";
 
-const DIR = __dirname; // may differ between many modules type
+const CURRENT_TARGET_BUILD_DIR = __dirname; // may differ between many modules type
+const BACK_TO_ROOT = '../../../';
+dotenv.config( {path: path.join( BACK_TO_ROOT + '.env')} );
 
 export class FileDB {
     private filepath: string;
 
-    constructor(filename:string) {
-        this.filepath = path.join( DIR, filename );
+    constructor() {
+        this.filepath = path.join( CURRENT_TARGET_BUILD_DIR, BACK_TO_ROOT, 'data.json' );
         // console.log(this.filepath);
     }
 
@@ -67,7 +70,7 @@ export class ProblemSummary {
     private records: Map<string, ProblemRecord>;
 
     constructor() {
-        const data = new FileDB('data.json').read();
+        const data = new FileDB().read();
 
         this.records = Utils.toProblemSummary(data);
     }
@@ -79,7 +82,7 @@ export class ProblemSummary {
     public update(submissions: RecentSubmission[]) {
         submissions.forEach(submission => {
             const timestamp = parseInt(submission.timestamp);
-            if(!this.records.has(submission.titleSlug)) {
+            if(!this.existProblem(submission.titleSlug)) {
                 this.addNewProblem(submission.titleSlug, timestamp, []);
             }
             else if(this.records.get(submission.titleSlug)?.getLastSubmission || 0 < timestamp) {
@@ -93,6 +96,7 @@ export class ProblemSummary {
             titleSlug,
             new ProblemRecord(lastSubmission, notes)   
         );
+        // console.log(this.records.get(titleSlug));
     }
 
     public updateLastSubmissionProblem(titleSlug: string, timestamp: number) {
@@ -101,6 +105,10 @@ export class ProblemSummary {
 
     public addNoteToProblem(titleSlug: string, noteContent: string) {
         this.records.get(titleSlug)?.addNote(noteContent);
+    }
+
+    public existProblem(titleSlug: string) : boolean {
+        return this.records.has(titleSlug)
     }
 
     public toString() : string {
@@ -121,10 +129,16 @@ export class ProblemPool {
         this.titleSlugs = this.problemSummary.toTitleSlugArray();
     }
 
+    public isEmpty() {
+        return this.titleSlugs.length === 0;
+    }
+
     public getFirstSlug() : string {
+        if(this.isEmpty()) return "";
         return this.titleSlugs[0];
     }
     public getLastSlug() : string {
+        if(this.isEmpty()) return "";
         return this.titleSlugs[this.titleSlugs.length-1];
     }
 
@@ -160,26 +174,22 @@ class Utils {
     }
 }
 
-async function test() {
+async function cronUpdateForUsername(username: string) {
     const leetcode = new LeetCode();
 
     const summary = new ProblemSummary();
 
-    const recent_submissions = await leetcode.recent_submissions("pkpawan");
+    const recent_submissions = await leetcode.recent_submissions(username);
 
-    summary.update(recent_submissions);
+    // console.log(recent_submissions);
 
-    const timeAscPool = new ProblemPool(summary);
-    timeAscPool.sortAscTimestamp();
-
-    const { content, title } = (await leetcode.problem(timeAscPool.getLastSlug()));
-    const notes = summary.getProblemRecord(timeAscPool.getLastSlug());
-
-    console.log(title);
-    console.log(content);
-    console.log(notes);
-
-    new FileDB('data.json').write(summary.toString());
+    if(recent_submissions.length > 0) {
+        summary.update(recent_submissions);
+        // console.log(summary.toTitleSlugArray());
+        new FileDB().write(summary.toString());
+    } else {
+        console.log("No Data/Empty Data Returned!");
+    }
 }
 
-// test();
+// cronUpdateForUsername(process.env['MY_LEETCODE_USERNAME'] ?? "");
