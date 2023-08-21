@@ -12,21 +12,27 @@ _w/ Bash_
 ```
 _w/ PowerShell_
 ```powershell
-    New-Item -Path . -Name "data.json"
+    New-Item -Path . -Name "data.json"; # in root folder
 ```
 
 2. add an empty object to _"data.json"_
-In file  _"data.json"_:
-```javascript
-    {}
+_w/ Bash_
+```bash
+    echo '{}' > data.json # in root folder
 ```
 
-3. run cron job to update data first
+```powershell
+    Add-Content -Path "data.json" -Value "{}" # in root folder
+```
+
+3. fill in .env.example and rename into .env
+
+4. run cron job to update data first
 ```bash
 npm run start-cron 
 ```
 
-4. run api service
+5. run api service
 ```bash
 npm run start-api 
 ```
