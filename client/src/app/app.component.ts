@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 const ROOT_ENV = '../../../.env',
     PROTOCOL="http",
     HOST="localhost:3000",
-    MY_LEETCODE_USERNAME="kshatriyas";
+    MY_LEETCODE_USERNAME="";
 
 @Component({ // component decorator describe how component is used at runtime
   selector: 'app-root',
@@ -18,7 +18,7 @@ export class AppComponent implements OnInit {
   notes: string[] = [];
 
   apiBaseURL =  `${PROTOCOL}://${HOST}`;
-  username = MY_LEETCODE_USERNAME;
+  username = "kshatriyas";
 
   // less coupling, more cohesion
   // expression should concise, quick, atomic
