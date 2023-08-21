@@ -1,5 +1,5 @@
 import path from 'path';
-import express from 'express';
+import express, { NextFunction } from 'express';
 import { LeetCode } from "leetcode-query";
 import { FileDB, ProblemPool, ProblemSummary } from '../cron/job';
 import { Express, Request, Response } from 'express';
@@ -9,6 +9,18 @@ const PORT = 3000;
 const app = express();
 app.use(express.json());
 
+app.use((req: Request, res: Response, next: NextFunction) => {
+    const headerToModify = {
+        'Access-Control-Allow-Origin' : '*',
+        'Access-Control-Allow-Credentials' : true,
+        'Access-Control-Allow-Methods' : 'GET,HEAD,OPTIONS,POST,PUT',
+        'Access-Control-Allow-Headers' : 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers'
+      };
+    
+      res.set(headerToModify);
+      // console.log("header modified");
+      next();
+})
 const leetcode = new LeetCode(); 
 
 let summary: ProblemSummary = new ProblemSummary();
