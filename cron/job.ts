@@ -5,7 +5,7 @@ import { LeetCode, RecentSubmission } from "leetcode-query";
 
 const CURRENT_TARGET_BUILD_DIR = __dirname; // may differ between many modules type
 const BACK_TO_ROOT = '../../../';
-dotenv.config( {path: path.join( BACK_TO_ROOT + '.env')} );
+dotenv.config( {path: path.join( CURRENT_TARGET_BUILD_DIR, BACK_TO_ROOT, '.env')} );
 
 export class FileDB {
     private filepath: string;
@@ -175,6 +175,7 @@ class Utils {
 }
 
 async function cronUpdateForUsername(username: string) {
+    console.log(username)
     const leetcode = new LeetCode();
 
     const summary = new ProblemSummary();
@@ -192,4 +193,4 @@ async function cronUpdateForUsername(username: string) {
     }
 }
 
-// cronUpdateForUsername(process.env['MY_LEETCODE_USERNAME'] ?? "");
+cronUpdateForUsername(process.env['MY_LEETCODE_USERNAME'] ?? "");
