@@ -1,0 +1,9 @@
+<section>
+    <div *ngFor="let item of notes">
+        <p>{{item}}</p>
+    </div>
+    <div>
+        <input id="contentToAdd">
+        <button (click)="onKey($event)">add note</button>
+    </div>
+</section>
