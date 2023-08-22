@@ -1,8 +1,3 @@
 <h3>{{title}}</h3>
 <div [innerHTML]="content" id="problem-content"></div>
-<h3>{{notes}}</h3>
-<div *ngFor="let item of notes">
-    <div [innerHTML]="item"></div>
-</div>
-<textarea></textarea>
-<button>add note to this problem </button>
+<note-list></note-list>
