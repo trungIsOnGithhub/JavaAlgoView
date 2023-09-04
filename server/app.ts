@@ -49,11 +49,13 @@ app.get('/:username', async (req: Request, res: Response) => {
 
     let currentLastSlug = timeAscPool.getLastSlug();
 
-    const { content, title } = (await leetcode.problem(currentLastSlug));
+    const { content, title, titleSlug } = (await leetcode.problem(currentLastSlug));
     const notes = summary.getProblemRecord(currentLastSlug);
 
+    console.log(titleSlug);
+
     res.status(200).json({
-        slug: currentLastSlug,
+        slug: titleSlug,
         title: title,
         content: content,
         notes: notes
@@ -64,7 +66,7 @@ app.post('/:titleSlug/note', async (req: Request, res: Response) => {
     let noteContent = req.body.content;
 
     if(!summary.existProblem(req.params['titleSlug'])) {
-        res.status(404).json("Unavailable Problem!");
+        res.status(404).json("Unexpected Problem!");
         return;
     }
 
@@ -76,3 +78,5 @@ app.post('/:titleSlug/note', async (req: Request, res: Response) => {
 app.listen(PORT, () => {
     console.log(`running on port: ${PORT}`)
 })
+
+// summary.addNoteToProblem('3sum', "dshjdkakdjaoisdjioaj");

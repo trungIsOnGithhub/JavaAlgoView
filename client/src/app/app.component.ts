@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
     fetch(`${this.apiBaseURL}/${this.username}`)
     .then(res => res.json())
     .then(json => {
-      this.titleSlug = json.titleSlug;
+      this.titleSlug = json.slug;
       this.title = json.title;
       this.content = json.content;
       this.notes = json.notes;
