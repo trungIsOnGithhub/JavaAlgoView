@@ -1,3 +1,8 @@
 <h3>{{title}}</h3>
 <div [innerHTML]="content" id="problem-content"></div>
-<note-list></note-list>
+<note-list
+    [titleSlug] = "titleSlug"
+    [apiBaseURL] = "apiBaseURL"
+    [notes] = "notes"
+    >
+</note-list>
